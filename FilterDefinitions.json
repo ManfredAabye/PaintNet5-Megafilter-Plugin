@@ -1,0 +1,521 @@
+{
+  "filters": [
+    {
+      "id": "brightness",
+      "name": "Helligkeit",
+      "description": "Passt die Helligkeit des Bildes an",
+      "parameters": [
+        {
+          "name": "amount",
+          "displayName": "Stärke",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "contrast",
+      "name": "Kontrast",
+      "description": "Passt den Kontrast des Bildes an",
+      "parameters": [
+        {
+          "name": "amount",
+          "displayName": "Stärke",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "saturation",
+      "name": "Sättigung",
+      "description": "Passt die Farbsättigung an",
+      "parameters": [
+        {
+          "name": "amount",
+          "displayName": "Stärke",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "blur",
+      "name": "Weichzeichner",
+      "description": "Weichzeichnung des Bildes",
+      "parameters": [
+        {
+          "name": "radius",
+          "displayName": "Radius",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 5
+        }
+      ]
+    },
+    {
+      "id": "sharpen",
+      "name": "Schärfen",
+      "description": "Schärft das Bild",
+      "parameters": [
+        {
+          "name": "amount",
+          "displayName": "Stärke",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 50
+        }
+      ]
+    },
+    {
+      "id": "hueshift",
+      "name": "Farbton verschieben",
+      "description": "Verschiebt den Farbton des Bildes",
+      "parameters": [
+        {
+          "name": "degrees",
+          "displayName": "Grad",
+          "type": "int",
+          "min": -180,
+          "max": 180,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "vignette",
+      "name": "Vignette",
+      "description": "Fügt eine Vignette hinzu",
+      "parameters": [
+        {
+          "name": "strength",
+          "displayName": "Stärke",
+          "type": "double",
+          "min": 0.0,
+          "max": 1.0,
+          "default": 0.5
+        },
+        {
+          "name": "radius",
+          "displayName": "Radius",
+          "type": "double",
+          "min": 0.0,
+          "max": 1.0,
+          "default": 0.7
+        }
+      ]
+    },
+    {
+      "id": "sepia",
+      "name": "Sepia",
+      "description": "Sepia-Effekt",
+      "parameters": [
+        {
+          "name": "intensity",
+          "displayName": "Intensität",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 100
+        }
+      ]
+    },
+    {
+      "id": "grayscale",
+      "name": "Graustufen",
+      "description": "Konvertiert zu Schwarzweiß",
+      "parameters": [
+        {
+          "name": "method",
+          "displayName": "Methode",
+          "type": "int",
+          "min": 0,
+          "max": 2,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "id": "invert",
+      "name": "Invertieren",
+      "description": "Invertiert Farben",
+      "parameters": [
+        {
+          "name": "intensity",
+          "displayName": "Intensität",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 100
+        }
+      ]
+    },
+    {
+      "id": "temperature",
+      "name": "Farbtemperatur",
+      "description": "Passt Farbtemperatur und Tint an",
+      "parameters": [
+        {
+          "name": "temp",
+          "displayName": "Temperatur",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        },
+        {
+          "name": "tint",
+          "displayName": "Tint",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "channelmixer",
+      "name": "Kanalmixer",
+      "description": "Mischt RGB-Kanäle",
+      "parameters": [
+        {
+          "name": "red",
+          "displayName": "Rot",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        },
+        {
+          "name": "green",
+          "displayName": "Grün",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        },
+        {
+          "name": "blue",
+          "displayName": "Blau",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "motionblur",
+      "name": "Bewegungsunschärfe",
+      "description": "Simuliert Bewegungsunschärfe",
+      "parameters": [
+        {
+          "name": "angle",
+          "displayName": "Winkel",
+          "type": "int",
+          "min": 0,
+          "max": 360,
+          "default": 0
+        },
+        {
+          "name": "distance",
+          "displayName": "Distanz",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 10
+        }
+      ]
+    },
+    {
+      "id": "edgedetect",
+      "name": "Kantenerkennung",
+      "description": "Erkennt Kanten im Bild",
+      "parameters": [
+        {
+          "name": "threshold",
+          "displayName": "Schwelle",
+          "type": "int",
+          "min": 0,
+          "max": 255,
+          "default": 100
+        }
+      ]
+    },
+    {
+      "id": "unsharpmask",
+      "name": "Unscharf maskieren",
+      "description": "Professionelles Schärfen",
+      "parameters": [
+        {
+          "name": "amount",
+          "displayName": "Stärke",
+          "type": "int",
+          "min": 0,
+          "max": 500,
+          "default": 100
+        },
+        {
+          "name": "radius",
+          "displayName": "Radius",
+          "type": "int",
+          "min": 1,
+          "max": 10,
+          "default": 2
+        },
+        {
+          "name": "threshold",
+          "displayName": "Schwelle",
+          "type": "int",
+          "min": 0,
+          "max": 255,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "posterize",
+      "name": "Posterisieren",
+      "description": "Reduziert Farbstufen",
+      "parameters": [
+        {
+          "name": "levels",
+          "displayName": "Stufen",
+          "type": "int",
+          "min": 2,
+          "max": 256,
+          "default": 8
+        }
+      ]
+    },
+    {
+      "id": "pixelate",
+      "name": "Verpixeln",
+      "description": "Pixeliert das Bild",
+      "parameters": [
+        {
+          "name": "blocksize",
+          "displayName": "Blockgröße",
+          "type": "int",
+          "min": 2,
+          "max": 50,
+          "default": 8
+        }
+      ]
+    },
+    {
+      "id": "emboss",
+      "name": "Prägen",
+      "description": "Erzeugt 3D-Relief-Effekt",
+      "parameters": [
+        {
+          "name": "angle",
+          "displayName": "Winkel",
+          "type": "int",
+          "min": 0,
+          "max": 360,
+          "default": 45
+        },
+        {
+          "name": "depth",
+          "displayName": "Tiefe",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 50
+        }
+      ]
+    },
+    {
+      "id": "oilpainting",
+      "name": "Ölgemälde",
+      "description": "Ölgemälde-Effekt",
+      "parameters": [
+        {
+          "name": "brushsize",
+          "displayName": "Pinselgröße",
+          "type": "int",
+          "min": 1,
+          "max": 20,
+          "default": 5
+        },
+        {
+          "name": "intensity",
+          "displayName": "Intensität",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 50
+        }
+      ]
+    },
+    {
+      "id": "exposure",
+      "name": "Belichtung",
+      "description": "Passt Belichtung an",
+      "parameters": [
+        {
+          "name": "ev",
+          "displayName": "EV",
+          "type": "int",
+          "min": -300,
+          "max": 300,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "shadowhighlight",
+      "name": "Schatten/Lichter",
+      "description": "Passt Schatten und Lichter an",
+      "parameters": [
+        {
+          "name": "shadows",
+          "displayName": "Schatten",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        },
+        {
+          "name": "highlights",
+          "displayName": "Lichter",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "gamma",
+      "name": "Gamma",
+      "description": "Gamma-Korrektur",
+      "parameters": [
+        {
+          "name": "value",
+          "displayName": "Wert",
+          "type": "int",
+          "min": 10,
+          "max": 300,
+          "default": 100
+        }
+      ]
+    },
+    {
+      "id": "levels",
+      "name": "Tonwertkorrektur",
+      "description": "Tonwerte anpassen",
+      "parameters": [
+        {
+          "name": "blackpoint",
+          "displayName": "Schwarzpunkt",
+          "type": "int",
+          "min": 0,
+          "max": 255,
+          "default": 0
+        },
+        {
+          "name": "whitepoint",
+          "displayName": "Weißpunkt",
+          "type": "int",
+          "min": 0,
+          "max": 255,
+          "default": 255
+        },
+        {
+          "name": "midpoint",
+          "displayName": "Mittelpunkt",
+          "type": "int",
+          "min": 10,
+          "max": 990,
+          "default": 100
+        }
+      ]
+    },
+    {
+      "id": "glow",
+      "name": "Glühen",
+      "description": "Leuchteffekt",
+      "parameters": [
+        {
+          "name": "intensity",
+          "displayName": "Intensität",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 50
+        },
+        {
+          "name": "radius",
+          "displayName": "Radius",
+          "type": "int",
+          "min": 0,
+          "max": 50,
+          "default": 10
+        }
+      ]
+    },
+    {
+      "id": "noise",
+      "name": "Rauschen",
+      "description": "Fügt Rauschen hinzu",
+      "parameters": [
+        {
+          "name": "amount",
+          "displayName": "Stärke",
+          "type": "int",
+          "min": 0,
+          "max": 100,
+          "default": 25
+        },
+        {
+          "name": "type",
+          "displayName": "Typ",
+          "type": "int",
+          "min": 0,
+          "max": 2,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "chromatic",
+      "name": "Chromatische Aberration",
+      "description": "Farbversatz-Effekt",
+      "parameters": [
+        {
+          "name": "strength",
+          "displayName": "Stärke",
+          "type": "int",
+          "min": 0,
+          "max": 10,
+          "default": 3
+        }
+      ]
+    },
+    {
+      "id": "lensdistortion",
+      "name": "Linsenverzerrung",
+      "description": "Barrel/Pincushion Verzerrung",
+      "parameters": [
+        {
+          "name": "amount",
+          "displayName": "Stärke",
+          "type": "int",
+          "min": -100,
+          "max": 100,
+          "default": 0
+        }
+      ]
+    }
+  ]
+}

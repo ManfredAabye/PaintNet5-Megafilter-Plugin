@@ -1,0 +1,292 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using PaintDotNet;
+using PaintDotNet.Effects;
+using PaintDotNet.Imaging;
+using PaintDotNet.IndirectUI;
+using PaintDotNet.PropertySystem;
+using PaintDotNet.Rendering;
+
+namespace Megafilter;
+
+[PluginSupportInfo(typeof(PluginSupportInfo))]
+public sealed class MegafilterEffect : PropertyBasedBitmapEffect
+{
+    private FilterDefinitions? _filterDefinitions;
+    
+    public MegafilterEffect()
+        : base("Megafilter", 
+               null,
+               "Effects",  
+               BitmapEffectOptions.Create() with { IsConfigurable = true })
+    {
+        LoadFilterDefinitions();
+    }
+
+    private void LoadFilterDefinitions()
+    {
+        try
+        {
+            string jsonPath = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location) ?? "", "FilterDefinitions.json");
+            if (File.Exists(jsonPath))
+            {
+                string jsonContent = File.ReadAllText(jsonPath);
+                _filterDefinitions = JsonSerializer.Deserialize<FilterDefinitions>(jsonContent);
+            }
+        }
+        catch (Exception)
+        {
+            _filterDefinitions = new FilterDefinitions();
+        }
+    }
+
+    protected override PropertyCollection OnCreatePropertyCollection()
+    {
+        var properties = new List<Property>();
+
+        if (_filterDefinitions != null && _filterDefinitions.Filters.Count > 0)
+        {
+            var filterNames = _filterDefinitions.Filters.Select(f => f.Name).ToArray();
+            properties.Add(new StaticListChoiceProperty(PropertyNames.FilterType, filterNames, 0));
+
+            foreach (var filter in _filterDefinitions.Filters)
+            {
+                foreach (var param in filter.Parameters)
+                {
+                    string propName = $"{filter.Id}_{param.Name}";
+                    
+                    if (param.Type == "double")
+                    {
+                        properties.Add(new DoubleProperty(
+                            propName,
+                            param.Default,
+                            param.Min,
+                            param.Max));
+                    }
+                    else
+                    {
+                        properties.Add(new Int32Property(
+                            propName,
+                            (int)param.Default,
+                            (int)param.Min,
+                            (int)param.Max));
+                    }
+                }
+            }
+        }
+
+        return new PropertyCollection(properties);
+    }
+
+    protected override void OnRender(IBitmapEffectOutput output)
+    {
+        if (_filterDefinitions == null || _filterDefinitions.Filters.Count == 0)
+            return;
+
+        int filterIndex = Token.GetProperty<StaticListChoiceProperty>(PropertyNames.FilterType)!.Value;
+        var selectedFilter = _filterDefinitions.Filters[filterIndex];
+
+        using var sourceBitmap = Environment.GetSourceBitmapBgra32();
+        var sourceRegion = sourceBitmap.AsRegionPtr();
+
+        foreach (var rect in output.RenderRects)
+        {
+            if (output.CancellationToken.IsCancellationRequested)
+                return;
+
+            using var destBitmap = output.LockBgra32Bitmap(rect);
+            var destRegion = destBitmap.AsRegionPtr();
+
+            ApplyFilter(sourceRegion, destRegion, rect, selectedFilter);
+        }
+    }
+
+    private void ApplyFilter(RegionPtr<ColorBgra32> source, RegionPtr<ColorBgra32> dest, RectInt32 rect, FilterDefinition filter)
+    {
+        for (int y = 0; y < rect.Height; y++)
+        {
+            for (int x = 0; x < rect.Width; x++)
+            {
+                int srcX = rect.X + x;
+                int srcY = rect.Y + y;
+                
+                if (srcX >= 0 && srcX < source.Width && srcY >= 0 && srcY < source.Height)
+                {
+                    ColorBgra32 pixel = source[srcX, srcY];
+                    ColorBgra32 newPixel = ProcessPixel(pixel, srcX, srcY, source.Width, source.Height, filter);
+                    dest[x, y] = newPixel;
+                }
+            }
+        }
+    }
+
+    private ColorBgra32 ProcessPixel(ColorBgra32 pixel, int x, int y, int width, int height, FilterDefinition filter)
+    {
+        return filter.Id switch
+        {
+            "brightness" => ApplyBrightness(pixel, GetParameterValue(filter, "amount")),
+            "contrast" => ApplyContrast(pixel, GetParameterValue(filter, "amount")),
+            "saturation" => ApplySaturation(pixel, GetParameterValue(filter, "amount")),
+            "hueshift" => ApplyHueShift(pixel, GetParameterValue(filter, "degrees")),
+            "sepia" => ApplySepia(pixel, GetParameterValue(filter, "intensity")),
+            "vignette" => ApplyVignette(pixel, x, y, width, height, GetParameterValue(filter, "strength"), GetParameterValue(filter, "radius")),
+            _ => pixel
+        };
+    }
+
+    private double GetParameterValue(FilterDefinition filter, string paramName)
+    {
+        string propName = $"{filter.Id}_{paramName}";
+        
+        var property = Token.GetProperty(propName);
+        if (property is Int32Property intProp)
+        {
+            return intProp.Value;
+        }
+        else if (property is DoubleProperty doubleProp)
+        {
+            return doubleProp.Value;
+        }
+
+        return 0;
+    }
+
+    private ColorBgra32 ApplyBrightness(ColorBgra32 pixel, double amount)
+        {
+            int adjustment = (int)(amount * 2.55);
+            
+            return ColorBgra32.FromBgra(
+                Int32Util.ClampToByte(pixel.B + adjustment),
+                Int32Util.ClampToByte(pixel.G + adjustment),
+                Int32Util.ClampToByte(pixel.R + adjustment),
+                pixel.A);
+        }
+
+        private ColorBgra32 ApplyContrast(ColorBgra32 pixel, double amount)
+        {
+            double contrast = (amount + 100.0) / 100.0;
+            contrast *= contrast;
+
+            int r = Int32Util.ClampToByte((int)(((pixel.R / 255.0 - 0.5) * contrast + 0.5) * 255.0));
+            int g = Int32Util.ClampToByte((int)(((pixel.G / 255.0 - 0.5) * contrast + 0.5) * 255.0));
+            int b = Int32Util.ClampToByte((int)(((pixel.B / 255.0 - 0.5) * contrast + 0.5) * 255.0));
+
+            return ColorBgra32.FromBgra((byte)b, (byte)g, (byte)r, pixel.A);
+        }
+
+        private ColorBgra32 ApplySaturation(ColorBgra32 pixel, double amount)
+        {
+            double saturation = (amount + 100.0) / 100.0;
+            int gray = (int)(pixel.R * 0.299 + pixel.G * 0.587 + pixel.B * 0.114);
+
+            int r = Int32Util.ClampToByte((int)(gray + (pixel.R - gray) * saturation));
+            int g = Int32Util.ClampToByte((int)(gray + (pixel.G - gray) * saturation));
+            int b = Int32Util.ClampToByte((int)(gray + (pixel.B - gray) * saturation));
+
+            return ColorBgra32.FromBgra((byte)b, (byte)g, (byte)r, pixel.A);
+        }
+
+        private ColorBgra32 ApplyHueShift(ColorBgra32 pixel, double degrees)
+        {
+            var hsv = RgbToHsv(pixel.R, pixel.G, pixel.B);
+            hsv.h = (hsv.h + degrees) % 360.0;
+            if (hsv.h < 0) hsv.h += 360.0;
+
+            var rgb = HsvToRgb(hsv.h, hsv.s, hsv.v);
+            return ColorBgra32.FromBgra((byte)rgb.b, (byte)rgb.g, (byte)rgb.r, pixel.A);
+        }
+
+        private ColorBgra32 ApplySepia(ColorBgra32 pixel, double intensity)
+        {
+            double factor = intensity / 100.0;
+
+            int tr = (int)(0.393 * pixel.R + 0.769 * pixel.G + 0.189 * pixel.B);
+            int tg = (int)(0.349 * pixel.R + 0.686 * pixel.G + 0.168 * pixel.B);
+            int tb = (int)(0.272 * pixel.R + 0.534 * pixel.G + 0.131 * pixel.B);
+
+            int r = Int32Util.ClampToByte((int)(pixel.R + (tr - pixel.R) * factor));
+            int g = Int32Util.ClampToByte((int)(pixel.G + (tg - pixel.G) * factor));
+            int b = Int32Util.ClampToByte((int)(pixel.B + (tb - pixel.B) * factor));
+
+            return ColorBgra32.FromBgra((byte)b, (byte)g, (byte)r, pixel.A);
+        }
+
+        private ColorBgra32 ApplyVignette(ColorBgra32 pixel, int x, int y, int width, int height, double strength, double radius)
+        {
+            double centerX = width / 2.0;
+            double centerY = height / 2.0;
+            double maxDist = Math.Sqrt(centerX * centerX + centerY * centerY);
+
+            double dx = x - centerX;
+            double dy = y - centerY;
+            double distance = Math.Sqrt(dx * dx + dy * dy);
+
+            double vignette = 1.0 - Math.Pow(distance / (maxDist * radius), 2) * strength;
+            vignette = Math.Max(0, Math.Min(1, vignette));
+
+            return ColorBgra32.FromBgra(
+                (byte)(pixel.B * vignette),
+                (byte)(pixel.G * vignette),
+                (byte)(pixel.R * vignette),
+                pixel.A);
+        }
+
+        private (double h, double s, double v) RgbToHsv(int r, int g, int b)
+        {
+            double rd = r / 255.0;
+            double gd = g / 255.0;
+            double bd = b / 255.0;
+
+            double max = Math.Max(rd, Math.Max(gd, bd));
+            double min = Math.Min(rd, Math.Min(gd, bd));
+            double delta = max - min;
+
+            double h = 0;
+            if (delta != 0)
+            {
+                if (max == rd)
+                    h = 60 * (((gd - bd) / delta) % 6);
+                else if (max == gd)
+                    h = 60 * (((bd - rd) / delta) + 2);
+                else
+                    h = 60 * (((rd - gd) / delta) + 4);
+            }
+            if (h < 0) h += 360;
+
+            double s = max == 0 ? 0 : delta / max;
+            double v = max;
+
+            return (h, s, v);
+        }
+
+        private (int r, int g, int b) HsvToRgb(double h, double s, double v)
+        {
+            double c = v * s;
+            double x = c * (1 - Math.Abs((h / 60) % 2 - 1));
+            double m = v - c;
+
+            double rp = 0, gp = 0, bp = 0;
+
+            if (h < 60) { rp = c; gp = x; bp = 0; }
+            else if (h < 120) { rp = x; gp = c; bp = 0; }
+            else if (h < 180) { rp = 0; gp = c; bp = x; }
+            else if (h < 240) { rp = 0; gp = x; bp = c; }
+            else if (h < 300) { rp = x; gp = 0; bp = c; }
+            else { rp = c; gp = 0; bp = x; }
+
+            return (
+                (int)((rp + m) * 255),
+                (int)((gp + m) * 255),
+                (int)((bp + m) * 255)
+            );
+        }
+    }
+
+    private static class PropertyNames
+    {
+        public const string FilterType = "FilterType";
+    }
+}
