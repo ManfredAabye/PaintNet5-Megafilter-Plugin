@@ -7,14 +7,51 @@ Ein flexibles Filter-Plugin für Paint.NET 5, das Filtereffekte aus einer JSON-D
 - **JSON-basierte Filterdefinitionen**: Alle Filtereffekte werden aus `FilterDefinitions.json` geladen
 - **Vorschau in Echtzeit**: Paint.NET zeigt automatisch eine Live-Vorschau der Effekte
 - **Mehrere Filter enthalten**:
-  - Helligkeit
-  - Kontrast
-  - Sättigung
-  - Weichzeichner
-  - Schärfen
-  - Farbton verschieben
-  - Vignette
-  - Sepia
+
+### 🎨 **Basis-Anpassungen** (8 Filter)
+
+- **Helligkeit** ✅ - Helligkeit anpassen (-100 bis +100)
+- **Kontrast** ✅ - Kontrast verstärken/reduzieren (-100 bis +100)
+- **Sättigung** ✅ - Farbsättigung anpassen (-100 bis +100)
+- **Weichzeichner** ✅ - Gaußscher Weichzeichner (Radius 0-100)
+- **Schärfen** ✅ - Schärfen-Filter (0-100)
+- **Farbton verschieben** ✅ - Hue-Rotation (-180° bis +180°)
+- **Vignette** ✅ - Randabdunklung (Strength + Radius 0.0-1.0)
+- **Sepia** ✅ - Sepia-Ton-Effekt (Intensity 0-100)
+
+### 🖌️ **Farbfilter** (4 Filter)
+
+- **Graustufen** ✅ - Schwarzweiß (3 Methoden: Average, Luminosity, Desaturation)
+- **Invertieren** ✅ - Farben umkehren (Intensity 0-100%)
+- **Farbtemperatur** ✅ - Warm/Kalt + Tint-Anpassung (-100 bis +100)
+- **Kanalmixer** ✅ - RGB-Kanäle einzeln anpassen (-100 bis +100)
+
+### 🔍 **Schärfe & Weichzeichner** (3 Filter)
+
+- **Bewegungsunschärfe** ✅ - Motion Blur (Angle 0-360°, Distance 0-100px)
+- **Kantenerkennung** ✅ - Edge Detection mit Sobel-Operator (Threshold 0-255)
+- **Unscharf maskieren** ✅ - Professionelles Schärfen (Amount 0-500%, Radius 1-10, Threshold 0-255)
+
+### 🎭 **Stilisierung** (4 Filter)
+
+- **Posterisieren** ✅ - Farbreduktion (2-256 Stufen)
+- **Verpixeln** ✅ - Pixelate-Effekt (Block Size 2-50px)
+- **Prägen** ✅ - 3D-Relief-Effekt (Angle 0-360°, Depth 0-100)
+- **Ölgemälde** ✅ - Künstlerischer Look (Brush Size 1-20, Intensity 0-100)
+
+### ⚡ **Tonwert-Korrekturen** (4 Filter)
+
+- **Belichtung** ✅ - EV-Stops (-3 bis +3)
+- **Schatten/Lichter** ✅ - Dynamikbereich optimieren (je -100 bis +100)
+- **Gamma** ✅ - Gamma-Korrektur (0.1-3.0)
+- **Tonwertkorrektur** ✅ - Levels mit Black/White/Mid-Point
+
+### 🌟 **Spezialeffekte** (4 Filter)
+
+- **Glühen** ✅ - Bloom/Glow-Effekt (Intensity 0-100, Radius 0-50)
+- **Rauschen** ✅ - 3 Rausch-Typen (Gaussian, Uniform, Salt&Pepper)
+- **Chromatische Aberration** ✅ - Farbversatz-Linseneffekt (Strength 0-10)
+- **Linsenverzerrung** ✅ - Barrel/Pincushion Distortion (-100 bis +100)
 
 ## Installation
 
